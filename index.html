@@ -3,14 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Lecții de istorie românească pentru clasele a V-a și a VI-a, cu materiale PDF și video.">
+  <meta name="description" content="Lecții de istorie românească pentru clasele a V-a, a VI-a, a VII-a și a VIII-a, cu materiale PDF și video.">
   <title>Lecții de istorie românească</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="site-header">
     <a class="site-name" href="#acasa">Istorie românească</a>
-    <a class="header-link" href="#lectii">Lecții</a>
+    <nav class="header-nav" aria-label="Navigare principală">
+      <a class="header-link" href="#lectii">Lecții</a>
+      <button class="account-button" id="account-open" type="button">Cont / Autentificare</button>
+      <span class="account-email" id="account-email" hidden></span>
+      <button class="account-button account-signout" id="account-signout" type="button" hidden>Deconectare</button>
+    </nav>
   </header>
 
   <main id="acasa">
@@ -36,6 +41,8 @@
         <button class="filter-button is-active" type="button" data-grade="all" aria-pressed="true">Toate</button>
         <button class="filter-button" type="button" data-grade="5" aria-pressed="false">Clasa a V-a</button>
         <button class="filter-button" type="button" data-grade="6" aria-pressed="false">Clasa a VI-a</button>
+        <button class="filter-button" type="button" data-grade="7" aria-pressed="false">Clasa a VII-a</button>
+        <button class="filter-button" type="button" data-grade="8" aria-pressed="false">Clasa a VIII-a</button>
       </div>
 
       <div id="lesson-groups" class="lesson-groups" aria-live="polite"></div>
@@ -47,6 +54,33 @@
     <p>Istorie românească · Materiale pentru învățare</p>
   </footer>
 
+  <dialog class="auth-dialog" id="auth-dialog" aria-labelledby="auth-title">
+    <div class="auth-panel">
+      <button class="dialog-close" id="auth-close" type="button" aria-label="Închide">×</button>
+      <p class="eyebrow">Cont de utilizator</p>
+      <h2 id="auth-title">Autentificare</h2>
+      <p class="auth-description" id="auth-description">Intră în cont sau creează unul nou. Lecțiile pot fi accesate și fără cont.</p>
+
+      <div class="auth-tabs" role="group" aria-label="Alege acțiunea">
+        <button class="auth-tab is-active" type="button" data-auth-mode="login" aria-pressed="true">Autentificare</button>
+        <button class="auth-tab" type="button" data-auth-mode="signup" aria-pressed="false">Cont nou</button>
+      </div>
+
+      <form id="auth-form">
+        <label class="auth-label" for="auth-email">Adresa de email</label>
+        <input id="auth-email" name="email" type="email" autocomplete="email" required>
+        <label class="auth-label" for="auth-password">Parola</label>
+        <input id="auth-password" name="password" type="password" autocomplete="current-password" minlength="8" required>
+        <button class="password-reset" id="password-reset" type="button">Am uitat parola</button>
+        <button class="auth-submit" id="auth-submit" type="submit">Autentificare</button>
+      </form>
+      <p class="auth-message" id="auth-message" role="status" aria-live="polite"></p>
+    </div>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="auth.js"></script>
   <script>
     // Pune PDF-urile în folderul materiale și adaugă calea lor aici.
     // Exemplu: material: { type: "pdf", url: "materiale/clasa-5/lectia-1.pdf" }
@@ -74,6 +108,30 @@
           { title: "Țările Române și Imperiul Otoman", description: "Relații, confruntări și alianțe într-o regiune aflată la răscruce.", material: null },
           { title: "Viața cotidiană în lumea medievală", description: "Cum trăiau, munceau și sărbătoreau oamenii în trecut.", material: null },
           { title: "Către epoca modernă", description: "Schimbările care au pregătit lumea pentru o nouă epocă.", material: null }
+        ]
+      },
+      {
+        grade: 7,
+        gradeLabel: "Clasa a VII-a",
+        lessons: [
+          { title: "Societatea medievală", description: "Ierarhii, ocupații și viața de zi cu zi în Europa medievală.", material: null },
+          { title: "State și popoare medievale", description: "Regate și popoare care au schimbat harta Europei.", material: null },
+          { title: "Țările Române în Evul Mediu", description: "Formarea și dezvoltarea Moldovei, Țării Românești și Transilvaniei.", material: null },
+          { title: "Conducători și apărători ai țării", description: "Domnitori și luptele lor pentru păstrarea autonomiei.", material: null },
+          { title: "Cultură și credință în lumea medievală", description: "Biserici, mănăstiri, școli și moștenirea lor culturală.", material: null },
+          { title: "Marile descoperiri geografice", description: "Călătorii și întâlniri care au schimbat lumea cunoscută.", material: null }
+        ]
+      },
+      {
+        grade: 8,
+        gradeLabel: "Clasa a VIII-a",
+        lessons: [
+          { title: "Țările Române în epoca modernă", description: "Transformările politice și sociale de la începutul epocii moderne.", material: null },
+          { title: "Revoluția de la 1848", description: "Ideile și revendicările revoluționarilor români.", material: null },
+          { title: "Unirea Principatelor Române", description: "Alegerea lui Alexandru Ioan Cuza și pașii spre Unire.", material: null },
+          { title: "Independența României", description: "Drumul către independență și recunoașterea ei în Europa.", material: null },
+          { title: "Marea Unire din 1918", description: "Evenimentele care au dus la unirea provinciilor cu România.", material: null },
+          { title: "România în secolul al XX-lea", description: "Momente importante din istoria României contemporane.", material: null }
         ]
       }
     ];
