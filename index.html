@@ -25,6 +25,41 @@
       <p class="intro-text">Alege clasa pentru a găsi lecțiile și materialele de studiu.</p>
     </section>
 
+    <section class="membership-panel" id="membership-panel" aria-live="polite" hidden>
+      <div>
+        <p class="eyebrow">Contul meu</p>
+        <h2 id="membership-title">Abonament</h2>
+        <p class="membership-description" id="membership-description"></p>
+      </div>
+      <span class="membership-badge" id="membership-badge">Gratuit</span>
+    </section>
+
+    <section class="admin-panel" id="admin-panel" aria-labelledby="admin-title" hidden>
+      <div class="admin-heading">
+        <div>
+          <p class="eyebrow">Administrare</p>
+          <h2 id="admin-title">Abonamente</h2>
+        </div>
+        <button class="admin-refresh" id="admin-refresh" type="button">Reîncarcă lista</button>
+      </div>
+      <p class="admin-description">Activează sau dezactivează manual accesul Premium. Acest prototip nu procesează plăți.</p>
+      <form class="subscription-form" id="subscription-form">
+        <label for="subscription-user">Utilizator</label>
+        <select id="subscription-user" required>
+          <option value="">Alege un utilizator</option>
+        </select>
+        <label class="subscription-checkbox" for="subscription-active">
+          <input id="subscription-active" type="checkbox">
+          <span>Premium activ</span>
+        </label>
+        <label for="subscription-expiry">Activ până la (opțional)</label>
+        <input id="subscription-expiry" type="date">
+        <button class="auth-submit" id="subscription-save" type="submit">Salvează abonamentul</button>
+      </form>
+      <p class="auth-message" id="admin-message" role="status" aria-live="polite"></p>
+      <div class="subscription-list" id="subscription-list"></div>
+    </section>
+
     <section class="lessons" id="lectii" aria-labelledby="lessons-title">
       <div class="section-heading">
         <div>
@@ -81,6 +116,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="supabase-config.js"></script>
   <script src="auth.js"></script>
+  <script src="premium.js"></script>
   <script>
     // Pune PDF-urile în folderul materiale și adaugă calea lor aici.
     // Exemplu: material: { type: "pdf", url: "materiale/clasa-5/lectia-1.pdf" }
@@ -93,7 +129,7 @@
           { title: "Ce este istoria?", description: "Trecutul, timpul istoric și felul în care descoperim povestea oamenilor.", material: { type: "pdf", url: "materiale/lectia-1.pdf" } },
           { title: "Izvoarele istorice", description: "Obiecte, documente și mărturii care ne ajută să aflăm despre trecut.", material: null },
           { title: "Preistoria pe teritoriul României", description: "Primele comunități și primele așezări de pe teritoriul României.", material: null },
-          { title: "Geto-dacii", description: "Lumea geto-dacilor, credințele și organizarea lor.", material: null },
+          { title: "Geto-dacii", description: "Lumea geto-dacilor, credințele și organizarea lor.", material: null, premiumLessonId: "geto-dacii" },
           { title: "Dacia și Imperiul Roman", description: "Întâlnirea dintre daci și romani și formarea provinciei Dacia.", material: null },
           { title: "Romanizarea și moștenirea romană", description: "Urmele romanilor și legătura limbii române cu limba latină.", material: null }
         ]
@@ -128,7 +164,7 @@
         lessons: [
           { title: "Țările Române în epoca modernă", description: "Transformările politice și sociale de la începutul epocii moderne.", material: null },
           { title: "Revoluția de la 1848", description: "Ideile și revendicările revoluționarilor români.", material: null },
-          { title: "Unirea Principatelor Române", description: "Alegerea lui Alexandru Ioan Cuza și pașii spre Unire.", material: null },
+          { title: "Unirea Principatelor Române", description: "Alegerea lui Alexandru Ioan Cuza și pașii spre Unire.", material: null, premiumLessonId: "unirea-principatelor" },
           { title: "Independența României", description: "Drumul către independență și recunoașterea ei în Europa.", material: null },
           { title: "Marea Unire din 1918", description: "Evenimentele care au dus la unirea provinciilor cu România.", material: null },
           { title: "România în secolul al XX-lea", description: "Momente importante din istoria României contemporane.", material: null }
@@ -152,6 +188,22 @@
       return `<a class="material-link" href="${material.url}" target="_blank" rel="noopener noreferrer">${label} <span aria-hidden="true">↗</span></a>`;
     }
 
+    function renderPremiumDetail(lesson) {
+      if (!lesson.premiumLessonId) return "";
+      const content = window.premiumContent && window.premiumContent[lesson.premiumLessonId];
+      const unlocked = window.premiumAccess === true && content;
+
+      return `
+        <div class="premium-lesson">
+          <span class="premium-label">${unlocked ? "Conținut Premium" : "Lecție Premium"}</span>
+          <button class="premium-detail-button" type="button" data-premium-lesson="${lesson.premiumLessonId}" aria-expanded="false">
+            ${unlocked ? "Citește detaliile" : "Vezi detaliile"}
+          </button>
+          <div class="premium-content" data-premium-content="${lesson.premiumLessonId}" hidden></div>
+        </div>
+      `;
+    }
+
     function renderLessons() {
       const visibleGroups = lessons
         .filter(group => activeGrade === "all" || String(group.grade) === activeGrade)
@@ -171,6 +223,7 @@
               <article class="lesson-card">
                 <h4>${lesson.title}</h4>
                 <p>${lesson.description}</p>
+                ${renderPremiumDetail(lesson)}
                 <div class="card-material">${renderMaterial(lesson.material)}</div>
               </article>
             `).join("")}
@@ -181,6 +234,38 @@
       emptyState.hidden = visibleGroups.length > 0;
     }
 
+    groupsContainer.addEventListener("click", event => {
+      const button = event.target.closest("[data-premium-lesson]");
+      if (!button) return;
+
+      const lessonId = button.dataset.premiumLesson;
+      const content = window.premiumContent && window.premiumContent[lessonId];
+      const unlocked = window.premiumAccess === true && content;
+
+      if (!unlocked) {
+        window.dispatchEvent(new CustomEvent("premium-lesson-locked", {
+          detail: { signedIn: Boolean(window.siteUser) }
+        }));
+        return;
+      }
+
+      const panel = groupsContainer.querySelector(`[data-premium-content="${lessonId}"]`);
+      const opening = panel.hidden;
+      panel.replaceChildren();
+      if (opening) {
+        const heading = document.createElement("strong");
+        heading.className = "premium-content-title";
+        heading.textContent = content.title;
+        const body = document.createElement("p");
+        body.textContent = content.body;
+        panel.append(heading, body);
+      }
+      panel.hidden = !opening;
+      button.setAttribute("aria-expanded", String(opening));
+      button.textContent = opening ? "Ascunde detaliile" : "Citește detaliile";
+    });
+
+    window.addEventListener("premium-data-changed", renderLessons);
     filterButtons.forEach(button => {
       button.addEventListener("click", () => {
         activeGrade = button.dataset.grade;

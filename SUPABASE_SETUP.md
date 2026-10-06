@@ -38,3 +38,30 @@ Adresa exacta a Live Server poate diferi. Foloseste aceeasi adresa in browser si
 Testeaza crearea contului cu o adresa la care ai acces, confirma emailul daca este activata confirmarea, apoi testeaza autentificarea si resetarea parolei. In panoul Supabase, mergi la **Authentication → Users** ca sa vezi utilizatorii. Parolele nu sunt vizibile si nu trebuie cerute sau trimise proprietarului site-ului.
 
 Contul este optional: lectiile si materialele raman publice. Sesiunea utilizatorului este gestionata de Supabase Auth in browser.
+
+## 5. Activeaza prototipul de abonamente Premium
+
+Acest prototip acorda abonamentele manual, din site; nu incaseaza bani si nu foloseste un checkout.
+
+1. In Supabase, deschide **SQL Editor → New query**.
+2. Copiaza si ruleaza o singura data scriptul `supabase/premium-prototype.sql`. Acesta creeaza profilurile, abonamentele, continutul demonstrativ si politicile RLS. Emailurile conturilor existente sunt importate, iar conturile noi sunt adaugate automat.
+3. Creeaza-ti cont pe site si confirma adresa de email. Apoi, in **SQL Editor**, inlocuieste adresa din urmatoarea comanda cu adresa contului tau si ruleaz-o pentru a-ti acorda drepturi de administrator:
+
+```sql
+insert into public.site_admins (user_id)
+select id
+from auth.users
+where lower(email) = lower('adresa-ta@example.com')
+on conflict (user_id) do nothing;
+```
+
+Comanda trebuie sa afecteze un rand. Daca nu afecteaza niciunul, confirma ca adresa este cea a contului creat si ca acel cont exista in **Authentication → Users**.
+
+4. Deconecteaza-te si autentifica-te din nou. Conturile de administrator vad panoul **Abonamente**. Alege un utilizator, bifeaza sau debifeaza **Premium activ**, optional seteaza ultima zi de acces, apoi salveaza. Administratorul poate vedea statutul Premium si din lista de conturi.
+5. Utilizatorii autentificati vad daca au cont gratuit sau Premium. Lectiile demonstrative „Geto-dacii” si „Unirea Principatelor Romane” au detalii extinse stocate in Supabase; continutul este livrat numai utilizatorilor cu acces Premium activ sau administratorilor.
+
+### Siguranta si trecerea la plati reale
+
+Scriptul activeaza Row Level Security (RLS): utilizatorii isi pot citi doar propriul abonament, iar doar administratorii pot lista conturile sau modifica abonamentele. Textul demonstrativ Premium este pastrat in baza de date si protejat prin RLS, nu inclus in HTML.
+
+Nu trata butonul Premium ca plata si nu acorda acces automat pe baza unei confirmari din browser. Pentru vanzare reala va trebui integrat un procesator de plati si o functie server-side/webhook care verifica plata la procesator si actualizeaza abonamentul. Nu expune cheia `service_role` in site.

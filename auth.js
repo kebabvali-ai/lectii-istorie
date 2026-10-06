@@ -26,6 +26,7 @@
     ? window.supabase.createClient(config.url, config.anonKey)
     : null;
 
+  window.siteSupabase = client;
   let mode = "login";
 
   function showMessage(text, kind) {
@@ -173,10 +174,12 @@
 
   function updateAccount(session) {
     const user = session && session.user;
+    window.siteUser = user || null;
     openButton.hidden = Boolean(user);
     accountEmail.hidden = !user;
     signOutButton.hidden = !user;
     accountEmail.textContent = user ? user.email : "";
+    window.dispatchEvent(new CustomEvent("site-auth-state", { detail: { user: user || null } }));
   }
 
   client.auth.onAuthStateChange((event, session) => {
