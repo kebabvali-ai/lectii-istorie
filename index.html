@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Lecții de istorie românească pentru clasele a V-a și a VI-a, cu materiale PDF și video.">
+  <title>Lecții de istorie românească</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-name" href="#acasa">Istorie românească</a>
+    <a class="header-link" href="#lectii">Lecții</a>
+  </header>
+
+  <main id="acasa">
+    <section class="intro">
+      <p class="eyebrow">Materiale pentru elevi</p>
+      <h1>Învață istoria<br>pas cu pas.</h1>
+      <p class="intro-text">Alege clasa pentru a găsi lecțiile și materialele de studiu.</p>
+    </section>
+
+    <section class="lessons" id="lectii" aria-labelledby="lessons-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Lecții</p>
+          <h2 id="lessons-title">Alege clasa</h2>
+        </div>
+        <label class="search-box">
+          <span class="visually-hidden">Caută lecții</span>
+          <input id="lesson-search" type="search" placeholder="Caută o lecție...">
+        </label>
+      </div>
+
+      <div class="class-filters" role="group" aria-label="Filtrează lecțiile după clasă">
+        <button class="filter-button is-active" type="button" data-grade="all" aria-pressed="true">Toate</button>
+        <button class="filter-button" type="button" data-grade="5" aria-pressed="false">Clasa a V-a</button>
+        <button class="filter-button" type="button" data-grade="6" aria-pressed="false">Clasa a VI-a</button>
+      </div>
+
+      <div id="lesson-groups" class="lesson-groups" aria-live="polite"></div>
+      <p id="empty-state" class="empty-state" hidden>Nu am găsit lecții. Încearcă alt cuvânt sau alege altă clasă.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Istorie românească · Materiale pentru învățare</p>
+  </footer>
+
+  <script>
+    // Pune PDF-urile în folderul materiale și adaugă calea lor aici.
+    // Exemplu: material: { type: "pdf", url: "materiale/clasa-5/lectia-1.pdf" }
+    // Pentru YouTube: material: { type: "video", url: "https://www.youtube.com/watch?v=..." }
+    const lessons = [
+      {
+        grade: 5,
+        gradeLabel: "Clasa a V-a",
+        lessons: [
+          { title: "Ce este istoria?", description: "Trecutul, timpul istoric și felul în care descoperim povestea oamenilor.", material: { type: "pdf", url: "materiale/lectia-1.pdf" } },
+          { title: "Izvoarele istorice", description: "Obiecte, documente și mărturii care ne ajută să aflăm despre trecut.", material: null },
+          { title: "Preistoria pe teritoriul României", description: "Primele comunități și primele așezări de pe teritoriul României.", material: null },
+          { title: "Geto-dacii", description: "Lumea geto-dacilor, credințele și organizarea lor.", material: null },
+          { title: "Dacia și Imperiul Roman", description: "Întâlnirea dintre daci și romani și formarea provinciei Dacia.", material: null },
+          { title: "Romanizarea și moștenirea romană", description: "Urmele romanilor și legătura limbii române cu limba latină.", material: null }
+        ]
+      },
+      {
+        grade: 6,
+        gradeLabel: "Clasa a VI-a",
+        lessons: [
+          { title: "Europa în Evul Mediu", description: "Societatea medievală, viața la sat și apariția orașelor.", material: null },
+          { title: "Formarea statelor medievale românești", description: "Cum s-au format Țara Românească, Moldova și Transilvania.", material: null },
+          { title: "Domnitori și voievozi", description: "Conducători care au apărat și au organizat țările române.", material: null },
+          { title: "Țările Române și Imperiul Otoman", description: "Relații, confruntări și alianțe într-o regiune aflată la răscruce.", material: null },
+          { title: "Viața cotidiană în lumea medievală", description: "Cum trăiau, munceau și sărbătoreau oamenii în trecut.", material: null },
+          { title: "Către epoca modernă", description: "Schimbările care au pregătit lumea pentru o nouă epocă.", material: null }
+        ]
+      }
+    ];
+
+    const groupsContainer = document.getElementById("lesson-groups");
+    const searchInput = document.getElementById("lesson-search");
+    const emptyState = document.getElementById("empty-state");
+    const filterButtons = [...document.querySelectorAll(".filter-button")];
+    let activeGrade = "all";
+    let searchTerm = "";
+
+    function renderMaterial(material) {
+      if (!material || !material.url) {
+        return '<span class="material-pending">Material în pregătire</span>';
+      }
+
+      const label = material.type === "video" ? "Deschide video" : "Deschide PDF";
+      return `<a class="material-link" href="${material.url}" target="_blank" rel="noopener noreferrer">${label} <span aria-hidden="true">↗</span></a>`;
+    }
+
+    function renderLessons() {
+      const visibleGroups = lessons
+        .filter(group => activeGrade === "all" || String(group.grade) === activeGrade)
+        .map(group => ({
+          ...group,
+          visibleLessons: group.lessons.filter(lesson =>
+            `${lesson.title} ${lesson.description}`.toLocaleLowerCase("ro").includes(searchTerm)
+          )
+        }))
+        .filter(group => group.visibleLessons.length > 0);
+
+      groupsContainer.innerHTML = visibleGroups.map(group => `
+        <section class="grade-group" aria-labelledby="grade-${group.grade}">
+          <h3 id="grade-${group.grade}">${group.gradeLabel}</h3>
+          <div class="lesson-grid">
+            ${group.visibleLessons.map(lesson => `
+              <article class="lesson-card">
+                <h4>${lesson.title}</h4>
+                <p>${lesson.description}</p>
+                <div class="card-material">${renderMaterial(lesson.material)}</div>
+              </article>
+            `).join("")}
+          </div>
+        </section>
+      `).join("");
+
+      emptyState.hidden = visibleGroups.length > 0;
+    }
+
+    filterButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        activeGrade = button.dataset.grade;
+        filterButtons.forEach(filter => {
+          const isActive = filter === button;
+          filter.classList.toggle("is-active", isActive);
+          filter.setAttribute("aria-pressed", String(isActive));
+        });
+        renderLessons();
+      });
+    });
+
+    searchInput.addEventListener("input", () => {
+      searchTerm = searchInput.value.trim().toLocaleLowerCase("ro");
+      renderLessons();
+    });
+
+    renderLessons();
+  </script>
+</body>
+</html>
