@@ -72,12 +72,13 @@
         </label>
       </div>
 
-      <div class="class-filters" role="group" aria-label="Filtrează lecțiile după clasă">
-        <button class="filter-button is-active" type="button" data-grade="all" aria-pressed="true">Toate</button>
-        <button class="filter-button" type="button" data-grade="5" aria-pressed="false">Clasa a V-a</button>
-        <button class="filter-button" type="button" data-grade="6" aria-pressed="false">Clasa a VI-a</button>
-        <button class="filter-button" type="button" data-grade="7" aria-pressed="false">Clasa a VII-a</button>
-        <button class="filter-button" type="button" data-grade="8" aria-pressed="false">Clasa a VIII-a</button>
+      <div class="category-filters" role="group" aria-label="Alege categoria de studiu">
+        <button class="category-button is-active" type="button" data-category="gimnaziu" aria-pressed="true">Gimnaziu</button>
+        <button class="category-button" type="button" data-category="liceu" aria-pressed="false">Liceu</button>
+        <button class="category-button" type="button" data-category="bac" aria-pressed="false">Bacalaureat</button>
+      </div>
+      <div class="class-filters" id="class-filters" role="group" aria-label="Alege clasa"></div>
+      <p class="curriculum-note" id="curriculum-note">Teme orientative pentru clasele V–VIII. Materialele pot fi completate în funcție de programa urmată la clasă.</p>
       </div>
 
       <div id="lesson-groups" class="lesson-groups" aria-live="polite"></div>
@@ -123,6 +124,7 @@
     // Pentru YouTube: material: { type: "video", url: "https://www.youtube.com/watch?v=..." }
     const lessons = [
       {
+        category: "gimnaziu",
         grade: 5,
         gradeLabel: "Clasa a V-a",
         lessons: [
@@ -135,6 +137,7 @@
         ]
       },
       {
+        category: "gimnaziu",
         grade: 6,
         gradeLabel: "Clasa a VI-a",
         lessons: [
@@ -147,6 +150,7 @@
         ]
       },
       {
+        category: "gimnaziu",
         grade: 7,
         gradeLabel: "Clasa a VII-a",
         lessons: [
@@ -159,6 +163,7 @@
         ]
       },
       {
+        category: "gimnaziu",
         grade: 8,
         gradeLabel: "Clasa a VIII-a",
         lessons: [
@@ -169,15 +174,129 @@
           { title: "Marea Unire din 1918", description: "Evenimentele care au dus la unirea provinciilor cu România.", material: null },
           { title: "România în secolul al XX-lea", description: "Momente importante din istoria României contemporane.", material: null }
         ]
+      },
+      {
+        category: "liceu",
+        grade: 9,
+        gradeLabel: "Clasa a IX-a",
+        lessons: [
+          { title: "Izvoare și metode de cercetare istorică", description: "Cum analizăm sursele și construim explicații despre trecut.", material: null },
+          { title: "Preistoria și primele civilizații", description: "Apariția agriculturii, a orașelor și a primelor state.", material: null },
+          { title: "Civilizațiile Orientului antic", description: "Egiptul, Mesopotamia și organizarea primelor mari civilizații.", material: null },
+          { title: "Grecia antică", description: "Polisul, democrația ateniană și moștenirea greacă.", material: null },
+          { title: "Roma antică", description: "De la republică la imperiu și influența Romei în Europa.", material: null },
+          { title: "Lumea medievală", description: "Instituții, societate și schimbări în Europa medievală.", material: null }
+        ]
+      },
+      {
+        category: "liceu",
+        grade: 10,
+        gradeLabel: "Clasa a X-a",
+        lessons: [
+          { title: "Renașterea și umanismul", description: "Idei și transformări culturale care au schimbat Europa.", material: null },
+          { title: "Reforma și Contrareforma", description: "Schimbări religioase și urmările lor în societatea europeană.", material: null },
+          { title: "Marile descoperiri geografice", description: "Expansiunea europeană și întâlnirea dintre continente.", material: null },
+          { title: "Revoluția industrială", description: "Tehnologie, urbanizare și transformarea muncii.", material: null },
+          { title: "Revoluțiile moderne", description: "Revoluțiile americană și franceză și ideile drepturilor cetățenești.", material: null },
+          { title: "Formarea statului român modern", description: "Unirea Principatelor și reformele din timpul lui Alexandru Ioan Cuza.", material: null }
+        ]
+      },
+      {
+        category: "liceu",
+        grade: 11,
+        gradeLabel: "Clasa a XI-a",
+        lessons: [
+          { title: "Europa și lumea în secolul al XIX-lea", description: "Naționalism, liberalism și schimbarea echilibrului european.", material: null },
+          { title: "România: independență și modernizare", description: "Cucerirea independenței și consolidarea statului român.", material: null },
+          { title: "Primul Război Mondial", description: "Cauze, desfășurare și schimbările produse de război.", material: null },
+          { title: "Marea Unire și România interbelică", description: "Unirea din 1918 și evoluția României între cele două războaie.", material: null },
+          { title: "Regimuri politice în perioada interbelică", description: "Democrație, autoritarism și ideologii politice în Europa.", material: null },
+          { title: "Al Doilea Război Mondial", description: "Cauzele conflictului și consecințele sale pentru Europa.", material: null }
+        ]
+      },
+      {
+        category: "liceu",
+        grade: 12,
+        gradeLabel: "Clasa a XII-a",
+        lessons: [
+          { title: "România după Al Doilea Război Mondial", description: "Instaurarea regimului comunist și transformările societății.", material: null },
+          { title: "Regimul comunist în România", description: "Instituții, propagandă, represiune și viața cotidiană.", material: null },
+          { title: "Războiul Rece", description: "Lumea bipolară și confruntarea dintre cele două blocuri.", material: null },
+          { title: "Revoluția română din 1989", description: "Prăbușirea regimului comunist și începutul tranziției.", material: null },
+          { title: "România democratică și integrarea europeană", description: "Reconstrucția instituțiilor democratice și aderarea la UE.", material: null },
+          { title: "Memorie, patrimoniu și identitate", description: "Cum păstrăm și interpretăm moștenirea istorică.", material: null }
+        ]
+      },
+      {
+        category: "bac",
+        grade: "bac",
+        gradeLabel: "Pregătire pentru Bacalaureat",
+        lessons: [
+          { title: "Romanitatea românilor", description: "Originea, continuitatea și interpretările privind formarea poporului român.", material: null },
+          { title: "Autonomii locale și instituții centrale", description: "Formațiuni politice medievale și evoluția instituțiilor românești.", material: null },
+          { title: "Statul român modern", description: "Unirea Principatelor, reformele, independența și consolidarea statului.", material: null },
+          { title: "Constituirea României Mari", description: "Contextul și etapele unirilor din 1918.", material: null },
+          { title: "România în secolul al XX-lea", description: "Regimuri politice, constituții și evoluția statului român.", material: null },
+          { title: "Lucrul cu sursele și eseul istoric", description: "Identificarea ideilor, susținerea unui punct de vedere și organizarea eseului.", material: null }
+        ]
       }
     ];
 
     const groupsContainer = document.getElementById("lesson-groups");
     const searchInput = document.getElementById("lesson-search");
     const emptyState = document.getElementById("empty-state");
-    const filterButtons = [...document.querySelectorAll(".filter-button")];
+    const categoryButtons = [...document.querySelectorAll(".category-button")];
+    const classFilters = document.getElementById("class-filters");
+    const curriculumNote = document.getElementById("curriculum-note");
+    const categoryDetails = {
+      gimnaziu: {
+        grades: [5, 6, 7, 8],
+        note: "Teme orientative pentru clasele V–VIII. Materialele pot fi completate în funcție de programa urmată la clasă."
+      },
+      liceu: {
+        grades: [9, 10, 11, 12],
+        note: "Teme orientative pentru clasele IX–XII. Materialele pot fi completate în funcție de programa urmată la clasă."
+      },
+      bac: {
+        grades: [],
+        note: "Materiale orientative pentru recapitularea temelor de istorie de la Bacalaureat."
+      }
+    };
+    const gradeLabels = {
+      5: "Clasa a V-a",
+      6: "Clasa a VI-a",
+      7: "Clasa a VII-a",
+      8: "Clasa a VIII-a",
+      9: "Clasa a IX-a",
+      10: "Clasa a X-a",
+      11: "Clasa a XI-a",
+      12: "Clasa a XII-a"
+    };
+    let activeCategory = "gimnaziu";
     let activeGrade = "all";
     let searchTerm = "";
+
+    function renderClassFilters() {
+      const grades = categoryDetails[activeCategory].grades;
+      classFilters.hidden = grades.length === 0;
+      curriculumNote.textContent = categoryDetails[activeCategory].note;
+      classFilters.innerHTML = [
+        '<button class="filter-button is-active" type="button" data-grade="all" aria-pressed="true">Toate clasele</button>',
+        ...grades.map(grade => `<button class="filter-button" type="button" data-grade="${grade}" aria-pressed="false">${gradeLabels[grade]}</button>`)
+      ].join("");
+      activeGrade = "all";
+      classFilters.querySelectorAll(".filter-button").forEach(button => {
+        button.addEventListener("click", () => {
+          activeGrade = button.dataset.grade;
+          classFilters.querySelectorAll(".filter-button").forEach(filter => {
+            const isActive = filter === button;
+            filter.classList.toggle("is-active", isActive);
+            filter.setAttribute("aria-pressed", String(isActive));
+          });
+          renderLessons();
+        });
+      });
+    }
 
     function renderMaterial(material) {
       if (!material || !material.url) {
@@ -206,7 +325,8 @@
 
     function renderLessons() {
       const visibleGroups = lessons
-        .filter(group => activeGrade === "all" || String(group.grade) === activeGrade)
+        .filter(group => group.category === activeCategory)
+        .filter(group => activeCategory === "bac" || activeGrade === "all" || String(group.grade) === activeGrade)
         .map(group => ({
           ...group,
           visibleLessons: group.lessons.filter(lesson =>
@@ -216,8 +336,8 @@
         .filter(group => group.visibleLessons.length > 0);
 
       groupsContainer.innerHTML = visibleGroups.map(group => `
-        <section class="grade-group" aria-labelledby="grade-${group.grade}">
-          <h3 id="grade-${group.grade}">${group.gradeLabel}</h3>
+        <section class="grade-group" aria-labelledby="grade-${group.category}-${group.grade}">
+          <h3 id="grade-${group.category}-${group.grade}">${group.gradeLabel}</h3>
           <div class="lesson-grid">
             ${group.visibleLessons.map(lesson => `
               <article class="lesson-card">
@@ -266,14 +386,17 @@
     });
 
     window.addEventListener("premium-data-changed", renderLessons);
-    filterButtons.forEach(button => {
+    categoryButtons.forEach(button => {
       button.addEventListener("click", () => {
-        activeGrade = button.dataset.grade;
-        filterButtons.forEach(filter => {
+        activeCategory = button.dataset.category;
+        searchInput.value = "";
+        searchTerm = "";
+        categoryButtons.forEach(filter => {
           const isActive = filter === button;
           filter.classList.toggle("is-active", isActive);
           filter.setAttribute("aria-pressed", String(isActive));
         });
+        renderClassFilters();
         renderLessons();
       });
     });
@@ -283,6 +406,7 @@
       renderLessons();
     });
 
+    renderClassFilters();
     renderLessons();
   </script>
 </body>
