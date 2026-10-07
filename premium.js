@@ -17,7 +17,37 @@
   window.premiumAccess = false;
   window.premiumContent = {};
 
-  if (!client) return;
+  let adsScriptInserted = false;
+  let premiumReloadStarted = false;
+
+  function syncAds(isPremium) {
+    if (isPremium) {
+      if (adsScriptInserted && !premiumReloadStarted) {
+        premiumReloadStarted = true;
+        window.location.reload();
+      }
+      return;
+    }
+
+    if (adsScriptInserted) return;
+    adsScriptInserted = true;
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2261065845406229";
+    script.crossOrigin = "anonymous";
+    script.dataset.adsenseLoader = "true";
+    script.addEventListener("error", () => {
+      adsScriptInserted = false;
+      console.error("Nu s-a putut încărca scriptul Google AdSense.");
+    }, { once: true });
+    document.head.append(script);
+  }
+
+  if (!client) {
+    syncAds(false);
+    return;
+  }
 
   let profiles = [];
   let subscriptions = [];
@@ -151,7 +181,10 @@
     adminPanel.hidden = true;
     setMessage(adminMessage, "", false);
     window.dispatchEvent(new Event("premium-data-changed"));
-    if (!user) return;
+    if (!user) {
+      syncAds(false);
+      return;
+    }
 
     membershipTitle.textContent = "Se verifică abonamentul...";
     membershipDescription.textContent = "";
@@ -174,6 +207,7 @@
       const isAdmin = adminResult.data === true;
       window.premiumAccess = premiumResult.data === true;
       updateMembership(user, subscriptionResult.data);
+      syncAds(window.premiumAccess);
       adminPanel.hidden = !isAdmin;
 
       if (isAdmin) {
@@ -188,6 +222,7 @@
       window.premiumAccess = false;
       window.premiumContent = {};
       window.dispatchEvent(new Event("premium-data-changed"));
+      syncAds(true);
       if (!adminPanel.hidden) setMessage(adminMessage, error.message || "Nu s-au putut încărca datele.", true);
     }
   }

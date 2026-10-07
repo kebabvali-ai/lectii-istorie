@@ -39,6 +39,8 @@ Testeaza crearea contului cu o adresa la care ai acces, confirma emailul daca es
 
 Contul este optional: lectiile si materialele raman publice. Sesiunea utilizatorului este gestionata de Supabase Auth in browser.
 
+Scriptul AdSense se incarca dupa ce site-ul verifica sesiunea si statutul Premium. Vizitatorii si utilizatorii fara Premium pot primi reclame; pentru utilizatorii Premium scriptul nu este incarcat. Daca utilizatorul trece la Premium cat timp pagina este deschisa si reclamele au fost deja initializate, pagina se reincarca pentru a le opri.
+
 ## 5. Activeaza prototipul de abonamente Premium
 
 Acest prototip acorda abonamentele manual, din site; nu incaseaza bani si nu foloseste un checkout.

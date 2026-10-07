@@ -192,6 +192,7 @@
 
   client.auth.getSession().then(({ data, error }) => {
     if (error) {
+      updateAccount(null);
       showDialog();
       showMessage(error.message, "error");
       return;
